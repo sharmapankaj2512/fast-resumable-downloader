@@ -21,7 +21,7 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
   val url: String = s"http://$host:$port$path"
   val wireMockServer = new WireMockServer()
 
-  implicit val materializer = ActorMaterializer()
+  implicit val materialize: ActorMaterializer = ActorMaterializer()
 
   "Downloader with valid url" must {
     "return stream of partial response" in {
