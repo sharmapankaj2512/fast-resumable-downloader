@@ -17,7 +17,7 @@ case class RemoteResource(Url: String, offset: Int = 0) {
       .getOrElse(Source.empty)
   }
 
-  def httpRangeUrlConnection(): HttpURLConnection = {
+  private def httpRangeUrlConnection(): HttpURLConnection = {
     val connection = new URL(Url).openConnection().asInstanceOf[HttpURLConnection]
     connection.setRequestProperty("Range", s"bytes=$offset-")
     connection

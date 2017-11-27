@@ -1,7 +1,5 @@
 package com.github.downloader
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
@@ -16,14 +14,6 @@ import scala.concurrent.duration._
 
 class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with ImplicitSender with WordSpecLike
   with BeforeAndAfterEach with Matchers {
-  val Port = 8080
-  val Host = "localhost"
-  val Path = "/path/video.mp3"
-  val Url: String = s"http://$Host:$Port$Path"
-
-  val wireMockServer = new WireMockServer()
-
-  implicit val materialize: ActorMaterializer = ActorMaterializer()
 
   "Downloader with valid url" must {
     "return stream of partial response" in {
@@ -35,9 +25,9 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
       val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
       val result = Await.result(sink, 3.seconds)
 
-      assert(result.map(_.body).mkString == "hello")
-      assert(result.map(_.size).sum == 5)
-      assert(result.map(_.actualSize).sum == 5)
+      result.map(_.body) shouldBe Seq("hello")
+      result.map(_.size).sum shouldBe 5
+      result.map(_.actualSize).sum shouldBe 5
     }
 
     "return empty stream" in {
@@ -47,7 +37,7 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
 
       val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
 
-      assert(result(sink, 3.seconds).isEmpty)
+      result(sink, 3.seconds) shouldBe empty
     }
   }
 
@@ -59,7 +49,7 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
 
       val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
 
-      assert(result(sink, 3.seconds).isEmpty)
+      result(sink, 3.seconds) shouldBe empty
     }
   }
 
@@ -71,4 +61,12 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
   override def afterEach() {
     wireMockServer.stop()
   }
+
+  val Port = 8080
+  val Host = "localhost"
+  val Path = "/path/video.mp3"
+  val Url: String = s"http://$Host:$Port$Path"
+
+  val wireMockServer = new WireMockServer()
+  implicit val materialize: ActorMaterializer = ActorMaterializer()
 }
