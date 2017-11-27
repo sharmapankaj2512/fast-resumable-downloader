@@ -12,7 +12,7 @@ import scala.util.Try
 case class Downloader(Url: String, offset: Int = 0) {
   val connection: HttpURLConnection = httpRangeUrlConnection()
 
-  def download(): Try[Source[PartialResponse, Future[IOResult]]] = {
+  def stream(): Try[Source[PartialResponse, Future[IOResult]]] = {
     Try(connection.getInputStream)
       .map(stream => fromInputStream(() => stream)
         .map(PartialResponse(_, connection.getContentLength)))

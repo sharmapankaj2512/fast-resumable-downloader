@@ -30,7 +30,7 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
           .withStatus(200)
           .withBody("hello")))
 
-      val source = Downloader(url).download().get
+      val source = Downloader(url).stream().get
       val result = Await.result(source.runWith(Sink.seq), Duration(3, TimeUnit.SECONDS))
 
       assert(result.map(_.body).mkString == "hello")
@@ -43,7 +43,7 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
         .willReturn(aResponse()
           .withStatus(400)))
 
-      assert(Downloader(url).download().isFailure)
+      assert(Downloader(url).stream().isFailure)
     }
   }
 
@@ -53,7 +53,7 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
         .willReturn(aResponse()
           .withStatus(404)))
 
-      assert(Downloader(url).download().isFailure)
+      assert(Downloader(url).stream().isFailure)
     }
   }
 
