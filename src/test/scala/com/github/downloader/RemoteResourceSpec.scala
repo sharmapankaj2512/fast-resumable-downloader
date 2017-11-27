@@ -11,9 +11,10 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpecLike}
 
 import scala.concurrent.Await
+import scala.concurrent.Await._
 import scala.concurrent.duration._
 
-class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with ImplicitSender with WordSpecLike
+class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with ImplicitSender with WordSpecLike
   with BeforeAndAfterEach with Matchers {
   val port = 8080
   val host = "localhost"
@@ -30,7 +31,7 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
           .withStatus(200)
           .withBody("hello")))
 
-      val sink = Downloader(url).stream().runWith(Sink.seq)
+      val sink = RemoteResource(url).asStream().runWith(Sink.seq)
       val result = Await.result(sink, 3.seconds)
 
       assert(result.map(_.body).mkString == "hello")
@@ -43,9 +44,9 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
         .willReturn(aResponse()
           .withStatus(400)))
 
-      val sink = Downloader(url).stream().runWith(Sink.seq)
+      val sink = RemoteResource(url).asStream().runWith(Sink.seq)
 
-      assert(Await.result(sink, 3.seconds).isEmpty)
+      assert(result(sink, 3.seconds).isEmpty)
     }
   }
 
@@ -55,9 +56,9 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
         .willReturn(aResponse()
           .withStatus(404)))
 
-      val sink = Downloader(url).stream().runWith(Sink.seq)
+      val sink = RemoteResource(url).asStream().runWith(Sink.seq)
 
-      assert(Await.result(sink, 3.seconds).isEmpty)
+      assert(result(sink, 3.seconds).isEmpty)
     }
   }
 

@@ -7,10 +7,10 @@ import akka.stream.scaladsl.StreamConverters._
 
 import scala.util.Try
 
-case class Downloader(Url: String, offset: Int = 0) {
+case class RemoteResource(Url: String, offset: Int = 0) {
   val connection: HttpURLConnection = httpRangeUrlConnection()
 
-  def stream(): Source[PartialResponse, Any] = {
+  def asStream(): Source[PartialResponse, Any] = {
     Try(connection.getInputStream)
       .map(stream => fromInputStream(() => stream)
         .map(PartialResponse(_, connection.getContentLength)))
