@@ -16,22 +16,23 @@ import scala.concurrent.duration._
 
 class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with ImplicitSender with WordSpecLike
   with BeforeAndAfterEach with Matchers {
-  val port = 8080
-  val host = "localhost"
-  val path = "/path/video.mp3"
-  val url: String = s"http://$host:$port$path"
+  val Port = 8080
+  val Host = "localhost"
+  val Path = "/path/video.mp3"
+  val Url: String = s"http://$Host:$Port$Path"
+
   val wireMockServer = new WireMockServer()
 
   implicit val materialize: ActorMaterializer = ActorMaterializer()
 
   "Downloader with valid url" must {
     "return stream of partial response" in {
-      stubFor(get(urlEqualTo(path))
+      stubFor(get(urlEqualTo(Path))
         .willReturn(aResponse()
           .withStatus(200)
           .withBody("hello")))
 
-      val sink = RemoteResource(url).asStream().runWith(Sink.seq)
+      val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
       val result = Await.result(sink, 3.seconds)
 
       assert(result.map(_.body).mkString == "hello")
@@ -40,11 +41,11 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
     }
 
     "return empty stream" in {
-      stubFor(get(urlEqualTo(path))
+      stubFor(get(urlEqualTo(Path))
         .willReturn(aResponse()
           .withStatus(400)))
 
-      val sink = RemoteResource(url).asStream().runWith(Sink.seq)
+      val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
 
       assert(result(sink, 3.seconds).isEmpty)
     }
@@ -56,14 +57,14 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
         .willReturn(aResponse()
           .withStatus(404)))
 
-      val sink = RemoteResource(url).asStream().runWith(Sink.seq)
+      val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
 
       assert(result(sink, 3.seconds).isEmpty)
     }
   }
 
   override def beforeEach {
-    configureFor(host, port)
+    configureFor(Host, Port)
     wireMockServer.start()
   }
 
