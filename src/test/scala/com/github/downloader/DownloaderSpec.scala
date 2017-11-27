@@ -11,7 +11,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpecLike}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
 class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with ImplicitSender with WordSpecLike
   with BeforeAndAfterEach with Matchers {
@@ -30,8 +30,8 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
           .withStatus(200)
           .withBody("hello")))
 
-      val source = Downloader(url).stream()
-      val result = Await.result(source.runWith(Sink.seq), Duration(3, TimeUnit.SECONDS))
+      val sink = Downloader(url).stream().runWith(Sink.seq)
+      val result = Await.result(sink, 3.seconds)
 
       assert(result.map(_.body).mkString == "hello")
       assert(result.map(_.size).sum == 5)
@@ -43,10 +43,9 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
         .willReturn(aResponse()
           .withStatus(400)))
 
-      val source = Downloader(url).stream()
-      val result = Await.result(source.runWith(Sink.seq), Duration(3, TimeUnit.SECONDS))
+      val sink = Downloader(url).stream().runWith(Sink.seq)
 
-      assert(result.isEmpty)
+      assert(Await.result(sink, 3.seconds).isEmpty)
     }
   }
 
@@ -56,10 +55,9 @@ class DownloaderSpec() extends TestKit(ActorSystem("DownloaderSpec")) with Impli
         .willReturn(aResponse()
           .withStatus(404)))
 
-      val source = Downloader(url).stream()
-      val result = Await.result(source.runWith(Sink.seq), Duration(3, TimeUnit.SECONDS))
+      val sink = Downloader(url).stream().runWith(Sink.seq)
 
-      assert(result.isEmpty)
+      assert(Await.result(sink, 3.seconds).isEmpty)
     }
   }
 
