@@ -1,4 +1,4 @@
-name := "akka-quickstart-scala"
+name := "resumable-downloader"
 
 version := "1.0"
 
