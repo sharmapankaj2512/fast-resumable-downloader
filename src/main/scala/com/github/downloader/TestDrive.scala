@@ -1,8 +1,6 @@
 package com.github.downloader
 
 import java.io.FileWriter
-import java.security.MessageDigest
-import java.util.Base64
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
