@@ -1,9 +1,10 @@
-package com.github.downloader
+package com.github.downloader.examples
 
 import java.io.FileWriter
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import com.github.downloader.{CommandLineProgressBar, DownloadManager}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
