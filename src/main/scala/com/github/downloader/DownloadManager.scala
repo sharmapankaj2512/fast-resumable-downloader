@@ -4,7 +4,9 @@ import java.io.FileWriter
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Broadcast, GraphDSL, RunnableGraph, Sink}
+import akka.stream.scaladsl.GraphDSL._
+import akka.stream.scaladsl.RunnableGraph._
+import akka.stream.scaladsl.{Broadcast, GraphDSL, Sink}
 import akka.stream.{ActorMaterializer, ClosedShape}
 
 import scala.concurrent.Future
@@ -16,7 +18,7 @@ case class DownloadManager(progressBar: CommandLineProgressBar) {
     val progressBarSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => progressBar.tick(pr))
     val fileWriterSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => fileWriter.write(pr.body))
 
-    RunnableGraph.fromGraph(GraphDSL.create(progressBarSink, fileWriterSink)((_, _)) { implicit builder =>
+    fromGraph(create(progressBarSink, fileWriterSink)((_, _)) { implicit builder =>
       (ps, fs) =>
         import GraphDSL.Implicits._
 
