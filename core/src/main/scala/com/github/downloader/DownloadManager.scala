@@ -20,7 +20,7 @@ case class DownloadManager(progressBar: CommandLineProgressBar) {
     val fileName = Math.abs(url.hashCode).toString
     val fileWriter = new FileWriter(fileName, true)
     val stream = RemoteResource(url).asStream()
-    val progressBarSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => progressBar.tick(pr))
+    val progressBarSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => progressBar.tick(pr.size))
     val fileWriterSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => fileWriter.write(pr.body))
 
     val future = fromGraph(create(progressBarSink, fileWriterSink)((_, _)) { implicit builder =>
