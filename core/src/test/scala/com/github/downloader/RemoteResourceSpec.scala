@@ -39,6 +39,16 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
 
       result(sink, 3.seconds) shouldBe empty
     }
+
+    "return size of remote resource" in {
+      stubFor(head(urlEqualTo(Path))
+        .willReturn(aResponse()
+          .withStatus(200)
+          .withBody("hello")))
+
+
+      RemoteResource(Url).size() shouldBe 5
+    }
   }
 
   "Downloader with non-existent url" must {
