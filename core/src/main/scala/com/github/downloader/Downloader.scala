@@ -10,7 +10,7 @@ import akka.stream.{ActorMaterializer, ClosedShape}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class DownloadManager(progressBar: CommandLineProgressBar, file: File) {
+case class Downloader(progressBar: CommandLineProgressBar, file: File) {
   implicit val system = ActorSystem("downloader")
   implicit val materializer = ActorMaterializer()
 
