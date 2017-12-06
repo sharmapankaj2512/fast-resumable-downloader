@@ -20,7 +20,7 @@ case class RemoteResource(url: String) {
     size
   }
 
-  def asStream(offset: Int = 0): Source[PartialResponse, Any] = {
+  def asStream(offset: Long = 0): Source[PartialResponse, Any] = {
     val connection = HttpRangeConnection(url, offset)
 
     Try(connection.getInputStream)

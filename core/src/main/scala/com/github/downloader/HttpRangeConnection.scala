@@ -3,12 +3,9 @@ package com.github.downloader
 import java.io.InputStream
 import java.net.{HttpURLConnection, URL}
 
-case class HttpRangeConnection(url: String, startOffset: Int = 0, endOffset: Int = -1) {
+case class HttpRangeConnection(url: String, startOffset: Long = 0) {
   val connection: HttpURLConnection = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
-  if (endOffset == -1)
-    connection.setRequestProperty("Range", s"bytes=$startOffset-")
-  else
-    connection.setRequestProperty("Range", s"bytes=$startOffset-$endOffset")
+  connection.setRequestProperty("Range", s"bytes=$startOffset-")
 
   def getInputStream: InputStream = {
     connection.getInputStream

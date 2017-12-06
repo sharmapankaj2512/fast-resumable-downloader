@@ -14,8 +14,8 @@ case class Downloader(progressBar: CommandLineProgressBar, file: File) {
   implicit val system = ActorSystem("downloader")
   implicit val materializer = ActorMaterializer()
 
-  def startDownload(url: String): Future[Done] = {
-    val stream = RemoteResource(url).asStream()
+  def startDownload(url: String, offset: Long): Future[Done] = {
+    val stream = RemoteResource(url).asStream(offset)
     val pbSink: Sink[PartialResponse, Future[Done]] = Sink.foreach[PartialResponse](pr => progressBar.notify(pr))
     val fileSink: Sink[PartialResponse, Future[Done]] = Sink.foreach[PartialResponse](pr => file.notify(pr))
 
@@ -25,8 +25,8 @@ case class Downloader(progressBar: CommandLineProgressBar, file: File) {
 
         val broadcast = builder.add(Broadcast[PartialResponse](2))
         stream ~> broadcast.in
-        broadcast.out(0) ~> ps.in
-        broadcast.out(1) ~> fs.in
+        broadcast ~> ps.in
+        broadcast ~> fs.in
         ClosedShape
     }).run()._2.andThen { case _ =>
       file.end()
