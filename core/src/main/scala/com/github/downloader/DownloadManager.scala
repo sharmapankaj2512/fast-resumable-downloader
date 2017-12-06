@@ -12,7 +12,7 @@ import akka.stream.{ActorMaterializer, ClosedShape}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class DownloadManager(progressBar: CommandLineProgressBar) {
+case class DownloadManager(subscriber: DownloadSubscriber) {
   implicit val system = ActorSystem("reactive-tweets")
   implicit val materializer = ActorMaterializer()
 
@@ -20,7 +20,7 @@ case class DownloadManager(progressBar: CommandLineProgressBar) {
     val fileName = Math.abs(url.hashCode).toString
     val fileWriter = new FileWriter(fileName, true)
     val stream = RemoteResource(url).asStream()
-    val progressBarSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => progressBar.tick(pr.size))
+    val progressBarSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => subscriber.notify(pr))
     val fileWriterSink: Sink[PartialResponse, Future[Done]] = Sink.foreach(pr => fileWriter.write(pr.body))
 
     val future = fromGraph(create(progressBarSink, fileWriterSink)((_, _)) { implicit builder =>
