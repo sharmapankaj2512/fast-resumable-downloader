@@ -1,4 +1,4 @@
-package com.github.downloader
+package com.github.net
 
 import java.io.InputStream
 import java.net.{HttpURLConnection, URL}

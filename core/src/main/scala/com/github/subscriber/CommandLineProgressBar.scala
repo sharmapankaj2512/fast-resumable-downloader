@@ -1,4 +1,6 @@
-package com.github.downloader
+package com.github.subscriber
+
+import com.github.downloader.PartialResponse
 
 case class CommandLineProgressBar(totalSize: Float) extends DownloadSubscriber {
   var progress: Float = 0

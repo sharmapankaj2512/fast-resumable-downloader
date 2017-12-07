@@ -1,7 +1,9 @@
-package com.github.downloader
+package com.github.subscriber
 
-import java.io.{FileOutputStream, FileWriter}
+import java.io.FileOutputStream
 import java.nio.file.{Files, Paths}
+
+import com.github.downloader.PartialResponse
 
 import scala.util.Try
 

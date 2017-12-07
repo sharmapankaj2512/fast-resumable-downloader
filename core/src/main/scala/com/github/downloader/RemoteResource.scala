@@ -5,6 +5,7 @@ import java.net.{HttpURLConnection, URL}
 import akka.stream.IOResult
 import akka.stream.scaladsl.Source
 import akka.stream.scaladsl.StreamConverters._
+import com.github.net.HttpRangeConnection
 
 import scala.concurrent.Future
 import scala.util.Try
