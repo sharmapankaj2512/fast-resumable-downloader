@@ -17,7 +17,7 @@ case class File(url: String) extends DownloadSubscriber {
     fileWriter.write(partialResponse.byteString.toArray)
   }
 
-  override def end(): Unit = {
+  override def completed(): Unit = {
     fileWriter.close()
   }
 }

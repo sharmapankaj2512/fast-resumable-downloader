@@ -2,9 +2,11 @@ package com.github.downloader
 
 import java.net.{HttpURLConnection, URL}
 
+import akka.stream.IOResult
 import akka.stream.scaladsl.Source
 import akka.stream.scaladsl.StreamConverters._
 
+import scala.concurrent.Future
 import scala.util.Try
 
 case class RemoteResource(url: String) {
@@ -20,12 +22,12 @@ case class RemoteResource(url: String) {
     size
   }
 
-  def asStream(offset: Long = 0): Source[PartialResponse, Any] = {
+  def asStream(offset: Long = 0): Option[Source[PartialResponse, Future[IOResult]]] = {
     val connection = HttpRangeConnection(url, offset)
 
     Try(connection.getInputStream)
       .map(stream => fromInputStream(() => stream)
         .map(PartialResponse(_, connection.getContentLength)))
-      .getOrElse(Source.empty)
+      .toOption
   }
 }

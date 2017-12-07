@@ -1,41 +1,30 @@
 package com.github.downloader
 
-import akka.Done
+import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.GraphDSL._
-import akka.stream.scaladsl.RunnableGraph._
-import akka.stream.scaladsl.{Broadcast, GraphDSL, Sink}
-import akka.stream.{ActorMaterializer, ClosedShape}
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.{Broadcast, Sink}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class Downloader(progressBar: CommandLineProgressBar, file: File) {
+case class Downloader(subscribers: List[DownloadSubscriber]) {
   implicit val system = ActorSystem("downloader")
   implicit val materializer = ActorMaterializer()
 
-  def startDownload(url: String, offset: Long): Future[Done] = {
-    val stream = RemoteResource(url).asStream(offset)
-    val pbSink: Sink[PartialResponse, Future[Done]] = Sink.foreach[PartialResponse](pr => progressBar.notify(pr))
-    val fileSink: Sink[PartialResponse, Future[Done]] = Sink.foreach[PartialResponse](pr => file.notify(pr))
+  def startDownload(url: String, offset: Long) = {
+    val sinks = subscribers.map(subscriber => Sink.foreach[PartialResponse](pr => subscriber.notify(pr)))
 
-    cleanup(fromGraph(create(pbSink, fileSink)((_, _)) { implicit builder =>
-      (ps, fs) =>
-        import GraphDSL.Implicits._
+    val combined: Sink[PartialResponse, NotUsed] = Sink.combine(sinks.head, sinks.tail.head)(Broadcast(_))
 
-        val broadcast = builder.add(Broadcast[PartialResponse](2))
-        stream ~> broadcast.in
-        broadcast ~> ps.in
-        broadcast ~> fs.in
-        ClosedShape
-    }).run())
-  }
-
-  private def cleanup(tuple: (Future[Done], Future[Done])): Future[Done] = {
-    tuple._2.andThen { case _ =>
-      file.end()
-      system.terminate()
-    }
+    RemoteResource(url)
+      .asStream(offset)
+      .map(stream => combined.runWith(stream))
+      .getOrElse(Future.unit)
+      .onComplete(_ => {
+        subscribers.foreach(subscriber => subscriber.completed())
+        system.terminate()
+      })
   }
 }
 
@@ -46,6 +35,6 @@ object Downloader {
     val progressBar = CommandLineProgressBar(RemoteResource(url).size())
 
     progressBar.tick(downloadedSize)
-    Downloader(progressBar, file).startDownload(url, downloadedSize)
+    Downloader(List(progressBar, file)).startDownload(url, downloadedSize)
   }
 }

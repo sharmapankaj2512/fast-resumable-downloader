@@ -22,7 +22,7 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
           .withStatus(200)
           .withBody("hello")))
 
-      val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
+      val sink = RemoteResource(Url).asStream().get.runWith(Sink.seq)
       val result = Await.result(sink, 3.seconds)
 
       result.map(_.body) shouldBe Seq("hello")
@@ -35,9 +35,7 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
         .willReturn(aResponse()
           .withStatus(400)))
 
-      val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
-
-      result(sink, 3.seconds) shouldBe empty
+      RemoteResource(Url).asStream() shouldBe None
     }
 
     "return size of remote resource" in {
@@ -57,9 +55,7 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
         .willReturn(aResponse()
           .withStatus(404)))
 
-      val sink = RemoteResource(Url).asStream().runWith(Sink.seq)
-
-      result(sink, 3.seconds) shouldBe empty
+      RemoteResource(Url).asStream() shouldBe None
     }
   }
 

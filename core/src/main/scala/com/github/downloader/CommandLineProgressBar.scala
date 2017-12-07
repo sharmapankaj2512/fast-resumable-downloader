@@ -12,7 +12,7 @@ case class CommandLineProgressBar(totalSize: Float) extends DownloadSubscriber {
     tick(partialResponse.size)
   }
 
-  override def end(): Unit = {
+  override def completed(): Unit = {
     System.out.printf("\r\b Downloaded completed")
   }
 }
