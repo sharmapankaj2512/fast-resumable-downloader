@@ -11,14 +11,13 @@ import scala.concurrent.Future
 
 case class Downloader(subscribers: List[DownloadSubscriber]) {
   implicit val system: ActorSystem = ActorSystem("downloader")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val materialize: ActorMaterializer = ActorMaterializer()
 
-  def startDownload(url: String, offset: Long) = {
+  def startDownload(url: String, offset: Long): Unit = {
     val sinks = subscribers.map(subscriber => Sink.foreach[PartialResponse](pr => subscriber.notify(pr)))
     val combined: Sink[PartialResponse, NotUsed] = Sink.combine(sinks.head, sinks.tail.head)(Broadcast(_))
 
-    RemoteResource(url)
-      .asStream(offset)
+    RemoteResource(url).asStream(offset)
       .map(stream => combined.runWith(stream))
       .getOrElse(Future.unit)
       .onComplete(_ => {
@@ -29,7 +28,7 @@ case class Downloader(subscribers: List[DownloadSubscriber]) {
 }
 
 object Downloader {
-  def download(url: String) = {
+  def download(url: String): Unit = {
     val file = File(url)
     val downloadedSize = file.downloadedSize()
     val progressBar = CommandLineProgressBar(RemoteResource(url).size())
