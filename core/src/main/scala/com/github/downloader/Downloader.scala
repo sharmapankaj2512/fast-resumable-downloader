@@ -9,12 +9,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 case class Downloader(subscribers: List[DownloadSubscriber]) {
-  implicit val system = ActorSystem("downloader")
-  implicit val materializer = ActorMaterializer()
+  implicit val system: ActorSystem = ActorSystem("downloader")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   def startDownload(url: String, offset: Long) = {
     val sinks = subscribers.map(subscriber => Sink.foreach[PartialResponse](pr => subscriber.notify(pr)))
-
     val combined: Sink[PartialResponse, NotUsed] = Sink.combine(sinks.head, sinks.tail.head)(Broadcast(_))
 
     RemoteResource(url)
