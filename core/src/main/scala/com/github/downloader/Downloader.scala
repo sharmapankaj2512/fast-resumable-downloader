@@ -19,7 +19,7 @@ case class Downloader(progressBar: CommandLineProgressBar, file: File) {
     val pbSink: Sink[PartialResponse, Future[Done]] = Sink.foreach[PartialResponse](pr => progressBar.notify(pr))
     val fileSink: Sink[PartialResponse, Future[Done]] = Sink.foreach[PartialResponse](pr => file.notify(pr))
 
-    fromGraph(create(pbSink, fileSink)((_, _)) { implicit builder =>
+    cleanup(fromGraph(create(pbSink, fileSink)((_, _)) { implicit builder =>
       (ps, fs) =>
         import GraphDSL.Implicits._
 
@@ -28,9 +28,24 @@ case class Downloader(progressBar: CommandLineProgressBar, file: File) {
         broadcast ~> ps.in
         broadcast ~> fs.in
         ClosedShape
-    }).run()._2.andThen { case _ =>
+    }).run())
+  }
+
+  private def cleanup(tuple: (Future[Done], Future[Done])): Future[Done] = {
+    tuple._2.andThen { case _ =>
       file.end()
       system.terminate()
     }
+  }
+}
+
+object Downloader {
+  def download(url: String) = {
+    val file = File(url)
+    val downloadedSize = file.downloadedSize()
+    val progressBar = CommandLineProgressBar(RemoteResource(url).size())
+
+    progressBar.tick(downloadedSize)
+    Downloader(progressBar, file).startDownload(url, downloadedSize)
   }
 }
