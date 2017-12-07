@@ -25,7 +25,7 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
       val sink = RemoteResource(Url).asStream().get.runWith(Sink.seq)
       val result = Await.result(sink, 3.seconds)
 
-      result.map(_.body) shouldBe Seq("hello")
+      result.map(_.bodyAsString) shouldBe Seq("hello")
       result.map(_.size).sum shouldBe 5
       result.map(_.actualSize).sum shouldBe 5
     }

@@ -16,7 +16,7 @@ case class File(url: String) extends DownloadSubscriber {
   }
 
   override def notify(partialResponse: PartialResponse): Unit = {
-    fileWriter.write(partialResponse.byteString.toArray)
+    fileWriter.write(partialResponse.body)
   }
 
   override def completed(): Unit = {
