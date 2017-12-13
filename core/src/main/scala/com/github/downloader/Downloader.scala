@@ -26,14 +26,3 @@ case class Downloader(subscribers: List[DownloadSubscriber]) {
       })
   }
 }
-
-object Downloader {
-  def download(url: String): Unit = {
-    val file = File(url)
-    val downloadedSize = file.downloadedSize()
-    val progressBar = CommandLineProgressBar(RemoteResource(url).size())
-
-    progressBar.tick(downloadedSize)
-    Downloader(List(progressBar, file)).startDownload(url, downloadedSize)
-  }
-}
