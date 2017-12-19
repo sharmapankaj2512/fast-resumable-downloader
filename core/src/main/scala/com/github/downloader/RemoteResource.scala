@@ -24,8 +24,18 @@ case class RemoteResource(url: String) {
   }
 
   def asStream(offset: Long = 0): Option[Source[PartialResponse, Future[IOResult]]] = {
-    val connection = HttpRangeConnection(url, offset)
+    asStream(HttpRangeConnection(url, offset))
+  }
 
+  def asParallelStream(streamSize: Int = 5000000): List[Source[PartialResponse, Future[IOResult]]] = {
+    Chunkifier.chunkify(size(), streamSize)
+      .map({ case (start, end) => HttpRangeConnection(url, start, end) })
+      .map(asStream)
+      .filter(_.isDefined)
+      .map(_.get)
+  }
+
+  private def asStream(connection: HttpRangeConnection): Option[Source[PartialResponse, Future[IOResult]]] = {
     Try(connection.getInputStream)
       .map(stream => fromInputStream(() => stream)
         .map(PartialResponse(_, connection.getContentLength)))

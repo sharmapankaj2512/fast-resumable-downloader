@@ -30,6 +30,21 @@ class RemoteResourceSpec() extends TestKit(ActorSystem("DownloaderSpec")) with I
       result.map(_.actualSize).sum shouldBe 5
     }
 
+    "return parallel streams of partial response" in {
+      stubFor(get(urlEqualTo(Path))
+        .willReturn(aResponse()
+          .withStatus(200)
+          .withBody("hello")))
+
+      val sink = RemoteResource(Url).asParallelStream().map(_.runWith(Sink.seq))
+      val result = Await.result(sink.head, 3.seconds)
+
+      result.map(_.bodyAsString) shouldBe Seq("hello")
+      result.map(_.size).sum shouldBe 5
+      result.map(_.actualSize).sum shouldBe 5
+    }
+
+
     "return empty stream" in {
       stubFor(get(urlEqualTo(Path))
         .willReturn(aResponse()
