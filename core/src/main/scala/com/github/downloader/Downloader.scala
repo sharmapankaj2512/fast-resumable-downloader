@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Broadcast, Sink}
-import com.github.subscriber.{CommandLineProgressBar, DownloadSubscriber, File}
+import com.github.subscriber.DownloadSubscriber
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
