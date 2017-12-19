@@ -7,7 +7,7 @@ case class CommandLineProgressBar(totalSize: Float) extends DownloadSubscriber {
 
   def tick(chunkSize: Float): Unit = {
     progress += (chunkSize * 100.0f) / totalSize
-    System.out.printf("\r\b Downloaded " + progress.asInstanceOf[Int] + "%%")
+    System.out.printf(s"\r\b Download Progress [ ${progress.asInstanceOf[Int]}%% ]")
   }
 
   override def notify(partialResponse: PartialResponse): Unit = {
