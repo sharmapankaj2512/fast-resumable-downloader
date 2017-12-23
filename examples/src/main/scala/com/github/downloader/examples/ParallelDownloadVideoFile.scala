@@ -5,7 +5,8 @@ import com.github.subscriber.CommandLineProgressBar
 
 object ParallelDownloadVideoFile extends App {
   val url = "http://mirrors.standaloneinstaller.com/video-sample/jellyfish-25-mbps-hd-hevc.3gp"
-  val progressBar = CommandLineProgressBar(RemoteResource(url).size())
+  val resource = RemoteResource(url)
+  val progressBar = CommandLineProgressBar(resource.size())
 
-  ParallelDownloader(progressBar).startDownload(url, 0)
+  ParallelDownloader(progressBar).startDownload(resource)
 }

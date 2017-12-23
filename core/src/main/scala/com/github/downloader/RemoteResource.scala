@@ -11,16 +11,20 @@ import scala.concurrent.Future
 import scala.util.Try
 
 case class RemoteResource(url: String) {
+  var cachedSize: Int = -1
+
   def size(): Int = {
-    val connection = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
-    connection.setRequestMethod("HEAD")
+    if (cachedSize == -1) {
+      val connection = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
+      connection.setRequestMethod("HEAD")
 
-    val size = Try(connection.getInputStream)
-      .map(_ => connection.getContentLength)
-      .getOrElse(0)
+      cachedSize = Try(connection.getInputStream)
+        .map(_ => connection.getContentLength)
+        .getOrElse(0)
 
-    connection.disconnect()
-    size
+      connection.disconnect()
+    }
+    cachedSize
   }
 
   def asStream(offset: Long = 0): Option[Source[PartialResponse, Future[IOResult]]] = {

@@ -17,12 +17,12 @@ case class ParallelDownloader(subscriber: DownloadSubscriber) {
   implicit val system: ActorSystem = ActorSystem("downloader")
   implicit val materialize: ActorMaterializer = ActorMaterializer()
 
-  def startDownload(url: String, offset: Long): Unit = {
-    val fileName = Paths.get(url).getFileName.toString
+  def startDownload(remoteResource: RemoteResource, offset: Long = 0): Unit = {
+    val fileName = Paths.get(remoteResource.url).getFileName.toString
     val partFileNamePrefix = s"part-$fileName"
-    val actualSize = RemoteResource(url).size()
+    val actualSize = remoteResource.size()
 
-    Future.sequence(RemoteResource(url).asParallelStream()
+    Future.sequence(remoteResource.asParallelStream()
       .map(s => s.map(pr => pr.byteString))
       .zipWithIndex.map({ case (stream, index) => sink(partFileNamePrefix, index, actualSize).runWith(stream) }))
       .onComplete(_ => {
