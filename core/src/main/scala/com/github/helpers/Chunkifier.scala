@@ -1,4 +1,4 @@
-package com.github.downloader
+package com.github.helpers
 
 object Chunkifier {
   def chunkify(totalSize: Int, chunkSize: Int): List[(Int, Int)] = {

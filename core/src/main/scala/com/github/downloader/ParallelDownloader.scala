@@ -8,6 +8,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Broadcast, FileIO, Sink}
 import akka.util.ByteString
+import com.github.helpers.FileMerger
 import com.github.subscriber.DownloadSubscriber
 
 import scala.concurrent.ExecutionContext.Implicits.global

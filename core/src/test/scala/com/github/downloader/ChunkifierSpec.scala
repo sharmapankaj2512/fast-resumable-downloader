@@ -1,5 +1,6 @@
 package com.github.downloader
 
+import com.github.helpers.Chunkifier
 import org.scalatest.{FlatSpec, Matchers}
 
 class ChunkifierSpec  extends FlatSpec with Matchers {

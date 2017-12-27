@@ -1,4 +1,4 @@
-package com.github.downloader
+package com.github.helpers
 
 import java.io.{File, FileInputStream, SequenceInputStream}
 import java.nio.file.{Files, Paths}
