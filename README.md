@@ -11,11 +11,11 @@ Built using scala and akka-streams. It has following features.
 ### Contributing
 
 #### Setup
-1. Install scala
-2. Install sbt
-3. git clone https://github.com/sharmapankaj2512/fast-resumable-downloader.git
-4. cd fast-resumable-downloader
-5. sbt clean compile
+1. [Install scala](https://www.scala-lang.org/download/)
+2. [Install sbt](http://www.scala-sbt.org/1.0/docs/Setup.html)
+3. `git clone https://github.com/sharmapankaj2512/fast-resumable-downloader.git`
+4. `cd fast-resumable-downloader`
+5. `sbt clean compile`
 
 ### License
 Fast resumable downloader is licensed under the [MIT License](https://opensource.org/licenses/MIT).
