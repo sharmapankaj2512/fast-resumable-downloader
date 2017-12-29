@@ -17,5 +17,8 @@ Built using scala and akka-streams. It has following features.
 4. `cd fast-resumable-downloader`
 5. `sbt clean compile`
 
+#### Future Improvements
+1. Try replace `HttpURLConnection` with `akka-http`
+
 ### License
 Fast resumable downloader is licensed under the [MIT License](https://opensource.org/licenses/MIT).
