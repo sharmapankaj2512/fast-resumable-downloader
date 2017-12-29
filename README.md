@@ -4,6 +4,7 @@ Built using scala and akka-streams. It has following features.
 1. Download large files
 2. Download progress notifications
 3. Resume failed downloads
+4. Supports both sequential and parallel downloads
 
 ### Code Status
 [![CircleCI](https://circleci.com/gh/sharmapankaj2512/resumable-downloader-scala-akka.svg?style=svg)](https://circleci.com/gh/sharmapankaj2512/resumable-downloader-scala-akka)
