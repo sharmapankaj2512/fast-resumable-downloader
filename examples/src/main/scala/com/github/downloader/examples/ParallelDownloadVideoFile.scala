@@ -8,5 +8,5 @@ object ParallelDownloadVideoFile extends App {
   val resource = RemoteResource(url)
   val progressBar = CommandLineProgressBar(resource.size())
 
-  ParallelDownloader(progressBar).startDownload(resource)
+  ParallelDownloader(progressBar).download(resource)
 }

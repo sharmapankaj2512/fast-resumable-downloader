@@ -6,9 +6,10 @@ object CommandLineDownloader {
   def download(url: String): Unit = {
     val file = File(url)
     val downloadedSize = file.downloadedSize()
-    val progressBar = CommandLineProgressBar(RemoteResource(url).size())
+    val remoteResource = RemoteResource(url)
+    val progressBar = CommandLineProgressBar(remoteResource.size())
 
     progressBar.tick(downloadedSize)
-    Downloader(List(progressBar, file)).startDownload(url, downloadedSize)
+    SequentialDownloader(List(progressBar, file)).download(remoteResource, downloadedSize)
   }
 }

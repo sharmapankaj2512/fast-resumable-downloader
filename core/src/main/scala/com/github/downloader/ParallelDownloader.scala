@@ -3,8 +3,8 @@ package com.github.downloader
 import java.io._
 import java.nio.file.Paths
 
-import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.{Done, NotUsed}
+import akka.actor.{ActorSystem, Terminated}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Broadcast, FileIO, Sink}
 import akka.util.ByteString
@@ -14,11 +14,11 @@ import com.github.subscriber.DownloadSubscriber
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class ParallelDownloader(subscriber: DownloadSubscriber) {
+case class ParallelDownloader(subscriber: DownloadSubscriber) extends Downloader {
   implicit val system: ActorSystem = ActorSystem("downloader")
   implicit val materialize: ActorMaterializer = ActorMaterializer()
 
-  def startDownload(remoteResource: RemoteResource, offset: Long = 0): Unit = {
+  def download(remoteResource: RemoteResource, downloadedOffset: Long = 0): Unit = {
     val fileName = Paths.get(remoteResource.url).getFileName.toString
     val partFileNamePrefix = s"part-$fileName"
     val actualSize = remoteResource.size()
