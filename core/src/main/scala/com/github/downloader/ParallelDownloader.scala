@@ -18,7 +18,7 @@ case class ParallelDownloader(subscriber: DownloadSubscriber) extends Downloader
   implicit val system: ActorSystem = ActorSystem("downloader")
   implicit val materialize: ActorMaterializer = ActorMaterializer()
 
-  def download(remoteResource: RemoteResource, downloadedOffset: Long = 0): Unit = {
+  def download(remoteResource: RemoteResource): Unit = {
     val fileName = Paths.get(remoteResource.url).getFileName.toString
     val partFileNamePrefix = s"part-$fileName"
     val actualSize = remoteResource.size()

@@ -11,7 +11,7 @@ import com.github.net.HttpRangeConnection
 import scala.concurrent.Future
 import scala.util.Try
 
-case class RemoteResource(url: String) {
+case class RemoteResource(url: String, downloadedOffset: Long = 0) {
   var cachedSize: Int = -1
 
   def size(): Int = {
@@ -28,8 +28,8 @@ case class RemoteResource(url: String) {
     cachedSize
   }
 
-  def asStream(offset: Long = 0): Option[Source[PartialResponse, Future[IOResult]]] = {
-    asStream(HttpRangeConnection(url, offset))
+  def asStream(): Option[Source[PartialResponse, Future[IOResult]]] = {
+    asStream(HttpRangeConnection(url, downloadedOffset))
   }
 
   def asParallelStream(streamSize: Int = 5000000): List[Source[PartialResponse, Future[IOResult]]] = {

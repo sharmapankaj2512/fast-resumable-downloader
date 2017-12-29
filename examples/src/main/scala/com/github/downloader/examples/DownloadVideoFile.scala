@@ -8,9 +8,10 @@ object DownloadVideoFile extends App {
 
   val file = File(url)
   val downloadedSize = file.downloadedSize()
-  val remoteResource = RemoteResource(url)
+  val remoteResource = RemoteResource(url, downloadedSize)
   val progressBar = CommandLineProgressBar(remoteResource.size())
-
   progressBar.tick(downloadedSize)
-  SequentialDownloader(List(progressBar, file)).download(remoteResource, downloadedSize)
+
+  SequentialDownloader(List(progressBar, file))
+    .download(remoteResource)
 }

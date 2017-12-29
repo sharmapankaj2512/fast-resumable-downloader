@@ -13,11 +13,11 @@ case class SequentialDownloader(subscribers: List[DownloadSubscriber]) extends D
   implicit val system: ActorSystem = ActorSystem("downloader")
   implicit val materialize: ActorMaterializer = ActorMaterializer()
 
-  def download(remoteResource: RemoteResource, offset: Long): Unit = {
+  def download(remoteResource: RemoteResource): Unit = {
     val sinks = subscribers.map(subscriber => Sink.foreach[PartialResponse](pr => subscriber.notify(pr)))
     val combined: Sink[PartialResponse, NotUsed] = Sink.combine(sinks.head, sinks.tail.head)(Broadcast(_))
 
-    remoteResource.asStream(offset)
+    remoteResource.asStream()
       .map(stream => combined.runWith(stream))
       .getOrElse(Future.unit)
       .onComplete(_ => {
